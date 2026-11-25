@@ -1,0 +1,64 @@
+name: APK oluştur
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apk
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Proje paketini aç (yalnız ilk kurulumda)
+        run: |
+          if [ -f YuzYuze.zip ]; then
+            unzip -o YuzYuze.zip -d . && rm -f YuzYuze.zip
+            git config user.name "github-actions" && git config user.email "actions@github.com"
+            git add -A && git commit -m "Proje dosyaları" && git push || echo "push atlandı"
+          fi
+
+      - name: İmza anahtarı yoksa üret
+        run: |
+          if [ ! -f keystore/yuzyuze.jks ]; then
+            mkdir -p keystore
+            keytool -genkeypair -keystore keystore/yuzyuze.jks -alias yuzyuze -keyalg RSA -keysize 2048 -validity 10000 -storepass yuzyuze2026 -keypass yuzyuze2026 -dname "CN=Yuz Yuze, O=Ali Dinler, C=TR"
+            git config user.name "github-actions" && git config user.email "actions@github.com"
+            git add keystore && git commit -m "İmza anahtarı" && git push || echo "push atlandı"
+          fi
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Android SDK paketleri
+        run: |
+          SDK="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          SM="$SDK/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SM" --licenses > /dev/null 2>&1 || true
+          "$SM" "platforms;android-34" "build-tools;34.0.0" "platform-tools" > /dev/null
+          echo "sdk.dir=$SDK" > local.properties
+
+      - uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.7'
+
+      - name: APK derle
+        run: gradle assembleRelease --no-daemon --stacktrace
+
+      - name: Yayınla (Releases)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          name: Yüz Yüze v${{ github.run_number }}
+          body: Telefona indir ve kur. Eski sürüm yüklüyse "Güncelle" seçeneği çıkar.
+          files: app/build/outputs/apk/release/YuzYuze.apk
