@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- kamera gövdesi -->
+    <path android:fillColor="#F4B942"
+        android:pathData="M24,36 h40 a6,6 0 0 1 6,6 v24 a6,6 0 0 1 -6,6 h-40 a6,6 0 0 1 -6,-6 v-24 a6,6 0 0 1 6,-6 z" />
+    <!-- kamera vizörü -->
+    <path android:fillColor="#F4B942"
+        android:pathData="M72,48 l14,-8 v28 l-14,-8 z" />
+    <!-- yüz: gözler -->
+    <path android:fillColor="#000000"
+        android:pathData="M36,50 m-3.5,0 a3.5,3.5 0 1 0 7,0 a3.5,3.5 0 1 0 -7,0 z" />
+    <path android:fillColor="#000000"
+        android:pathData="M52,50 m-3.5,0 a3.5,3.5 0 1 0 7,0 a3.5,3.5 0 1 0 -7,0 z" />
+    <!-- yüz: gülümseme -->
+    <path android:strokeColor="#000000" android:strokeWidth="3.2" android:strokeLineCap="round" android:fillColor="#00000000"
+        android:pathData="M35,59 q9,8 18,0" />
+</vector>
